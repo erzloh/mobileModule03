@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
-import { useNavigation } from "expo-router";
 import { weatherCodeToIconName } from "@/constants/weather";
+import { useTabSwipeLock } from "@/hooks/useTabSwipeLock";
 import { useSearchContext } from "@/context/SearchContext";
 import { fetchTodayHourlyWeather, type OpenMeteoHourlyWeather } from "@/lib/openMeteo";
 
@@ -27,7 +27,7 @@ type ChartData = {
 };
 
 export default function TodayScreen() {
-  const navigation = useNavigation();
+  const { disableTabSwipe, enableTabSwipe } = useTabSwipeLock();
   const { selectedLocation, locationMessage } = useSearchContext();
   const { width: windowWidth } = useWindowDimensions();
   const [hourlyWeather, setHourlyWeather] = useState<OpenMeteoHourlyWeather[]>([]);
@@ -78,19 +78,6 @@ export default function TodayScreen() {
   }, [selectedLocation, locationMessage]);
 
   const chartWidth = Math.max(CHART_MIN_WIDTH, windowWidth - SCREEN_HORIZONTAL_PADDING * 2);
-  const disableTabSwipe = () => {
-    navigation.setOptions({ swipeEnabled: false });
-  };
-
-  const enableTabSwipe = () => {
-    navigation.setOptions({ swipeEnabled: true });
-  };
-
-  useEffect(() => {
-    return () => {
-      navigation.setOptions({ swipeEnabled: true });
-    };
-  }, [navigation]);
 
   const chartData = useMemo<ChartData | null>(() => {
     if (hourlyWeather.length < 2) {
